@@ -16,6 +16,30 @@ class WoocommerceService
         $this->pCServiceAPI = $pCServiceAPI;
     }
 
+    public function loadCategoryWoo(){
+
+        $categories = \App\Models\Category::all()->all();
+        $categoryTitles = [];
+        foreach ($categories as $arrayCategory) {
+            $data = [
+                'name' => $arrayCategory['title'],
+                'image' => $arrayCategory['image']
+            ];
+
+            try {
+                //Verificando para no isntertar dobles las categorias
+                if (!FunctionsHelper::verifyIfExistTitle($categoryTitles, $arrayCategory['title'])) {
+                    Category::create($data);
+                    $categoryTitles[] = $arrayCategory['title'];
+                }
+
+            } catch (\Exception $e) {
+
+            }
+        }
+
+    }
+
     public function loadProductsToWooCommerce(){
         $productsFromPCServices = $this->pCServiceAPI->getAllProduct();
         $categoryIdsAss = [];

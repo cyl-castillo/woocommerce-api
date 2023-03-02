@@ -22,6 +22,7 @@ Route::get('/products/load', [\App\Http\Controllers\WoocommerceController::class
 Route::get('/products/delete', [\App\Http\Controllers\WoocommerceController::class, 'deleteProducts']);
 Route::get('/category/create', [\App\Http\Controllers\WoocommerceController::class, 'updateCategory']);
 Route::get('/category/subcategory', [\App\Http\Controllers\WoocommerceController::class, 'updateSubcategories']);
+Route::get('/category/loadWoo', [\App\Http\Controllers\WoocommerceController::class, 'loadCategoryWoo']);
 Route::get('/category/delete', [\App\Http\Controllers\WoocommerceController::class, 'deleteCategory']);
 
 

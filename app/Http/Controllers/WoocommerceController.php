@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\FunctionsHelper;
 use App\Services\PCServiceAPI;
+use App\Services\WoocommerceService;
 use Codexshaper\WooCommerce\Facades\Product;
 use Codexshaper\WooCommerce\Models\Category;
 
@@ -12,12 +13,16 @@ class WoocommerceController extends Controller
 
     private $pcService;
 
+    private $woocomerceApi;
+
+
     /**
      * @param PCServiceAPI $pcService
      */
-    public function __construct(PCServiceAPI $pcService)
+    public function __construct(PCServiceAPI $pcService, WoocommerceService $woocomerceApi)
     {
         $this->pcService = $pcService;
+        $this->woocomerceApi = $woocomerceApi;
     }
 
     public function test(){
@@ -105,6 +110,12 @@ class WoocommerceController extends Controller
     public function deleteCategory(){
         $this->pcService->deleteAllCategories();
         return "Categorias Borradas";
+    }
+
+
+    public function loadCategoryWoo(){
+        $this->woocomerceApi->loadCategoryWoo();
+        return "Categorias Cargadas en Woocomerce";
     }
 
     /**
