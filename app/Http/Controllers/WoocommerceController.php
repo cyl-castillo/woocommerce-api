@@ -155,8 +155,7 @@ class WoocommerceController extends Controller
     }
 
     public function updateProducts(){
-        $this->pcService->updateStockAndPrice();
-        return "Productos Actualizados";
+        return $this->pcService->updateStockAndPrice();
     }
 
 }

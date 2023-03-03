@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\TokenApi;
 use App\Repositories\CategoryRepository;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 
@@ -140,19 +142,41 @@ class PCServiceAPI
 
         try {
             $products = Product::all()->all();
+
             foreach ($products as $product){
-                $data = Http::withToken(env('PCSERVICE_TOKEN'))->get($this->url."/products/". $product['id'])->json();
+                $data = Http::withToken(Session::get('pcs_tok'))->get($this->url."/products/". $product['id'])->json();
 
-                $product->price = $data['price']['price'];
-                if (isset($data['availability']['stock']))
+                if (isset($data['status'])){
+                    return new Response([],401);
+                }
+
+                $product->price_original = $data['price']['price'];
+                $product->price = $this->getPriceShopit($product->price_original);
+                $product->body = $data['body'];
+                if (isset($data['availability']['stock'])){
                     $product->stock = $data['availability']['stock'];
-
+                } else {
+                    if ($data['availability']['availability'])
+                        $product->stock = 5;
+                }
                 $product->save();
             }
         } catch (\Exception $exception){
 
         }
+        return "Productos Actualizados";
 
 }
+
+
+    private function getPriceShopit($price){
+
+        $conversion = $price * env('PRICE_CONVERSION');
+        $plus = $conversion * env('PRICE_PLUS') / 100;
+        $iva = ($conversion + $plus) * env('PRICE_IVA') / 100;
+
+        return $conversion + $plus + $iva;
+
+    }
 
 }
