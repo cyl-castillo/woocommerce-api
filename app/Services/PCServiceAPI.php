@@ -135,4 +135,24 @@ class PCServiceAPI
 
     }
 
+
+    public function updateStockAndPrice(){
+
+        try {
+            $products = Product::all()->all();
+            foreach ($products as $product){
+                $data = Http::withToken(env('PCSERVICE_TOKEN'))->get($this->url."/products/". $product['id'])->json();
+
+                $product->price = $data['price']['price'];
+                if (isset($data['availability']['stock']))
+                    $product->stock = $data['availability']['stock'];
+
+                $product->save();
+            }
+        } catch (\Exception $exception){
+
+        }
+
+}
+
 }

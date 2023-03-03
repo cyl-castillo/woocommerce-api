@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 Route::get('/category/test',  [\App\Http\Controllers\WoocommerceController::class, 'test']);
 Route::get('/products/load', [\App\Http\Controllers\WoocommerceController::class, 'loadProducts']);
+Route::get('/products/update', [\App\Http\Controllers\WoocommerceController::class, 'updateProducts']);
 Route::get('/products/delete', [\App\Http\Controllers\WoocommerceController::class, 'deleteProducts']);
 Route::get('/category/create', [\App\Http\Controllers\WoocommerceController::class, 'updateCategory']);
 Route::get('/category/subcategory', [\App\Http\Controllers\WoocommerceController::class, 'updateSubcategories']);

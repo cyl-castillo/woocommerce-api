@@ -154,4 +154,9 @@ class WoocommerceController extends Controller
         return "Productos cargados";
     }
 
+    public function updateProducts(){
+        $this->pcService->updateStockAndPrice();
+        return "Productos Actualizados";
+    }
+
 }
