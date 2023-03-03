@@ -24,6 +24,10 @@ class CategoryRepository
         return $this->category->create($cat);
     }
 
+    public function update($category){
+        return $this->category->update($category);
+    }
+
     public function delete($id){
 
         $category = $this->category->find($id);

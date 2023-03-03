@@ -30,7 +30,7 @@ class WoocommerceController extends Controller
         return $test;
     }
 
-    public function loadProducts(){
+    public function loadProductsss(){
 
         $productsFromPCServices = $this->pcService->getAllProduct();
 
@@ -112,7 +112,6 @@ class WoocommerceController extends Controller
         return "Categorias Borradas";
     }
 
-
     public function loadCategoryWoo(){
         $this->woocomerceApi->loadCategoryWoo();
         return "Categorias Cargadas en Woocomerce";
@@ -148,6 +147,11 @@ class WoocommerceController extends Controller
         ];
         Product::batch($dataToDelete);
         return "Productos Borrados";
+    }
+
+    public function loadProducts(){
+        $this->pcService->getAllProduct();
+        return "Productos cargados";
     }
 
 }

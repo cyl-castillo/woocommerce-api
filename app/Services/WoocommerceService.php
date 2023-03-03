@@ -3,17 +3,21 @@
 namespace App\Services;
 
 use App\Helpers\FunctionsHelper;
+use App\Repositories\CategoryRepository;
 use Codexshaper\WooCommerce\Facades\Product;
 use Codexshaper\WooCommerce\Models\Category;
+use function Symfony\Component\String\u;
 
 class WoocommerceService
 {
 
     private PCServiceAPI $pCServiceAPI;
+    private CategoryRepository $categoryRepository;
 
-    public function __construct(PCServiceAPI $pCServiceAPI)
+    public function __construct(PCServiceAPI $pCServiceAPI, CategoryRepository $categoryRepository)
     {
         $this->pCServiceAPI = $pCServiceAPI;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public function loadCategoryWoo(){
@@ -29,8 +33,12 @@ class WoocommerceService
             try {
                 //Verificando para no isntertar dobles las categorias
                 if (!FunctionsHelper::verifyIfExistTitle($categoryTitles, $arrayCategory['title'])) {
-                    Category::create($data);
+                    $category = Category::create($data);
                     $categoryTitles[] = $arrayCategory['title'];
+                    $updateCat = \App\Models\Category::find($arrayCategory['id']);
+                    $updateCat->id_woo = $category->id;
+                    $updateCat->save();
+
                 }
 
             } catch (\Exception $e) {

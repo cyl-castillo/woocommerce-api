@@ -24,8 +24,13 @@ Route::get('/category/create', [\App\Http\Controllers\WoocommerceController::cla
 Route::get('/category/subcategory', [\App\Http\Controllers\WoocommerceController::class, 'updateSubcategories']);
 Route::get('/category/loadWoo', [\App\Http\Controllers\WoocommerceController::class, 'loadCategoryWoo']);
 Route::get('/category/delete', [\App\Http\Controllers\WoocommerceController::class, 'deleteCategory']);
+Route::get('/category/deleteCategoryWoo', [\App\Http\Controllers\WoocommerceController::class, 'deleteCategoryWoo']);
 
 
 
 Route::get('/center/load/categories', [\App\Http\Controllers\StarCenterController::class, 'loadCategoriesCenter']);
 Route::get('/center/sync/categories', [\App\Http\Controllers\StarCenterController::class, 'synCategoriesCenter']);
+
+
+Route::post('/shopit/price', [\App\Http\Controllers\ShopitController::class, 'confgiPrice']);
+

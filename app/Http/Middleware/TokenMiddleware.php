@@ -20,14 +20,14 @@ class TokenMiddleware
     public function handle(Request $request, Closure $next)
     {
 
-            $response = Http::post(env("PCSERVICE_URL")."auth/login/", [
-                'username' => env('PCSERVICE_USER'),
-                'password' => env('PCSERVICE_PASSWORD')
-            ]);
-
-            $data = json_decode($response->getBody(), true);
-            $token = $data['token'];
-            \session(['pcs_tok' => $token]);
+//            $response = Http::post(env("PCSERVICE_URL")."auth/login/", [
+//                'username' => env('PCSERVICE_USER'),
+//                'password' => env('PCSERVICE_PASSWORD')
+//            ]);
+//
+//            $data = json_decode($response->getBody(), true);
+//            $token = $data['token'];
+//            \session(['pcs_tok' => $token]);
 
 
         return $next($request);
