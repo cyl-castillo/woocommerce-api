@@ -60,6 +60,7 @@ class WoocommerceService
     }
 
     public function loadProductsToWooCommerce(){
+
         $productsFromPCServices = \App\Models\Product::where('id_woo', null)->get()->all();
 
         $dataToInserts = [];
@@ -99,11 +100,16 @@ class WoocommerceService
                 'images' => $imagArr,
 
             ];
+            try {
+                $prod = Product::create($data);
+                $temp = \App\Models\Product::find($product['id']);
+                $temp->id_woo = $prod['id'];
+                $temp->save();
+            } catch (\Exception $exception){
 
-            $prod = Product::create($data);
-            $temp = \App\Models\Product::find($product['id']);
-            $temp->id_woo = $prod['id'];
-            $temp->save();
+            }
+
+
 
         }
         return Product::all();
