@@ -24,24 +24,35 @@ class WoocommerceService
 
         $categories = \App\Models\Category::all()->all();
         $categoryTitles = [];
+        $arrayDatas = [];
         foreach ($categories as $arrayCategory) {
             $data = [
                 'name' => $arrayCategory['title'],
-                'image' => $arrayCategory['image']
             ];
+            if ($arrayCategory['od_categoria'] != null)
+                $data['parent'] = \App\Models\Category::find($arrayCategory['od_categoria'])['id_woo'];
+
+            if ($arrayCategory['image'] != null)
+                $data['image'] = ['src' => $arrayCategory['image']];
 
             try {
                 //Verificando para no isntertar dobles las categorias
                 if (!FunctionsHelper::verifyIfExistTitle($categoryTitles, $arrayCategory['title'])) {
                     $category = Category::create($data);
-                    $categoryTitles[] = $arrayCategory['title'];
+                    $categoryTitles[] = ['title' => $arrayCategory['title'], 'id_woo' => $category->get('id')];
                     $updateCat = \App\Models\Category::find($arrayCategory['id']);
-                    $updateCat->id_woo = $category->id;
+                    $updateCat->id_woo = $category->get('id');
                     $updateCat->save();
 
+                } else {
+                    $updateCat = \App\Models\Category::find($arrayCategory['id']);
+                    $updateCat->id_woo = FunctionsHelper::getIdWooByTitle($categoryTitles,$arrayCategory['title']);
+                    $updateCat->save();
                 }
 
             } catch (\Exception $e) {
+
+                $e->getMessage();
 
             }
         }
@@ -49,51 +60,54 @@ class WoocommerceService
     }
 
     public function loadProductsToWooCommerce(){
-        $productsFromPCServices = $this->pCServiceAPI->getAllProduct();
-        $categoryIdsAss = [];
+        $productsFromPCServices = \App\Models\Product::where('id_woo', null)->get()->all();
+
+        $dataToInserts = [];
+        $cont = 0;
         foreach ($productsFromPCServices as $product) {
-            $arrayCategories = $product['categories'];
+
             $categoryIds = [];
-            $categoryTitles = [];
-            foreach ($arrayCategories as $arrayCategory) {
-                $data = [
-                    'name' => $arrayCategory['title']
+            $firstCat = \App\Models\Category::find($product['id_categoria'])->id_woo;
+            if ($firstCat != null)
+                $categoryIds[] = ['id' => $firstCat];
+
+            $subcategories = \App\Models\Category::where('od_categoria', $product['id_categoria'])->get();
+            foreach ($subcategories as $subcategory) {
+                if ($subcategory->id_woo != null)
+                    $id = $subcategory->id_woo;
+
+                $categoryIds[] = [
+                    'id' => $id
                 ];
-                $categoryTitles[] = $arrayCategory['title'];
-                try {
-                    //Verificando para no isntertar dobles las categorias
-                    if (!FunctionsHelper::verifyIfExistTitle($categoryTitles, $arrayCategory['title'])){
-                        $category = Category::create($data);
-                        $categoryIds[] = ['id' => $category['id']];
-                        $categoryIdsAss = [$arrayCategory['title'] => $category['id']];
-                    } else {
-                        $categoryIds[] = ['id' => $categoryIdsAss[$arrayCategory['title']]];
-                    }
-                } catch (\Exception $e){
-
-                }
-
             }
+
+            $imagArr = [];
+            foreach (json_decode($product['images']) as $image) {
+                $imagArr[] = ['src' => $image];
+            }
+
             $data = [
-                'name' => $product['description'],
+                'name' => $product['title'],
                 'type' => 'simple',
                 'short_description' => $product['description'],
                 'description' => $product['body'],
                 'sku' => $product['sku'],
-                'price' => $product['price']['price'],
-                'regular_price' => strval($product['price']['price']),
-                'stock_quantity' => 10,
+                'price' => strval(floatval($product['price_original']) * 41),
+                'regular_price' => strval(floatval($product['price'])),
+                'stock_quantity' => $product['stock'],
                 'categories' => $categoryIds,
-                'images' =>  [
-                    [
-                        'src' => $product['images'][0]['variations'][1]['url']
-                    ]
-                ],
+                'images' => $imagArr,
 
             ];
-            Product::create($data);
+
+            $prod = Product::create($data);
+            $temp = \App\Models\Product::find($product['id']);
+            $temp->id_woo = $prod['id'];
+            $temp->save();
+
         }
         return Product::all();
+
     }
 
 }

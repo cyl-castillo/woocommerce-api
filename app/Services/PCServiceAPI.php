@@ -134,6 +134,8 @@ class PCServiceAPI
             }
         }
 
+        return \Codexshaper\WooCommerce\Facades\Product::all();
+
 
     }
 

@@ -30,69 +30,9 @@ class WoocommerceController extends Controller
         return $test;
     }
 
-    public function loadProductsss(){
-
-        $productsFromPCServices = $this->pcService->getAllProduct();
-
-        $cont = 0;
-        $categoryIdsAss = [];
-        foreach ($productsFromPCServices as $product) {
-            $arrayCategories = $product['categories'];
-            $categoryIds = [];
-            $categoryTitles = [];
-            foreach ($arrayCategories as $arrayCategory) {
-                $data = [
-                    'name' => $arrayCategory['title']
-                ];
-                $categoryTitles[] = $arrayCategory['title'];
-                try {
-                    //Verificando para no isntertar dobles las categorias
-                    if (!FunctionsHelper::verifyIfExistTitle($categoryTitles, $arrayCategory['title'])){
-                        $category = Category::create($data);
-                        $categoryIds[] = ['id' => $category['id']];
-                        $categoryIdsAss = [$arrayCategory['title'] => $category['id']];
-                    } else {
-                        $categoryIds[] = ['id' => $categoryIdsAss[$arrayCategory['title']]];
-                    }
-                } catch (\Exception $e){
-
-                }
-
-            }
-
-
-
-                $pro = '0';
-                if ($cont < 10){
-                    $data = [
-                        'name' => $product['title'],
-                        'type' => 'simple',
-                        'short_description' => $product['description'],
-                        'description' => $product['body'],
-                        'sku' => $product['sku'],
-                        'price' => $product['price']['price'],
-                        'regular_price' => strval($product['price']['price']),
-                    'stock_quantity' => 10,
-                    'categories' => $categoryIds,
-                    'images' =>  [
-                        [
-                            'src' => $product['images'][0]['variations'][1]['url']
-                        ]
-                    ],
-
-                ];
-                    Product::create($data);
-                    $cont++;
-                } else {
-                    return;
-                }
-
-        }
-        return Product::all();
-    }
-
 
     /**
+     * Actualiza las categorias en la tabla de sincronizacion
      * @return array
      */
     public function updateCategory() {
@@ -101,23 +41,36 @@ class WoocommerceController extends Controller
          return \App\Models\Category::all();
     }
 
+    /**
+     * Actualiza las subcategorias en la tabla de sincronizacion
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
 
     public function updateSubcategories(){
         $this->pcService->getAllSubCategoriesAndSave();
         return \App\Models\Category::all();
     }
 
+    /**
+     * Elimina las categorias de la tabla de sincronizacion
+     * @return string
+     */
     public function deleteCategory(){
         $this->pcService->deleteAllCategories();
         return "Categorias Borradas";
     }
 
+    /**
+     * Carga las categorias en woocomerce
+     * @return string
+     */
     public function loadCategoryWoo(){
         $this->woocomerceApi->loadCategoryWoo();
         return "Categorias Cargadas en Woocomerce";
     }
 
     /**
+     * Elimina las categorias de woocomerce
      * @return string
      */
     public function deleteCategoryWoo(){
@@ -135,6 +88,10 @@ class WoocommerceController extends Controller
         return "Categorias Borradas";
     }
 
+    /**
+     * Elimina los productos de Woocomerce
+     * @return string
+     */
     public function deleteProducts(){
         $options = ['per_page' => 100];
         $products = Product::all($options);
@@ -157,5 +114,15 @@ class WoocommerceController extends Controller
     public function updateProducts(){
         return $this->pcService->updateStockAndPrice();
     }
+
+    /**
+     * Carga los productos en woocomerce a partir de la tabla de sincronizacion
+     * @return mixed
+     */
+    public function loadProductWoo(){
+        return $this->woocomerceApi->loadProductsToWooCommerce();
+    }
+
+
 
 }
